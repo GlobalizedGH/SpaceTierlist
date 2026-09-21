@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceTiers • Official Competitive Space Tiers Ranking</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Rajdhani:wght@500;600;700;800&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            display: ['"Orbitron"', 'sans-serif'],
+            pixel: ['"Silkscreen"', 'monospace'],
+            heading: ['"Rajdhani"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            space: {
+              accent: 'var(--space-accent, #38bdf8)',
+              hover: 'var(--space-accent-hover, #0284c7)',
+              glow: 'var(--space-glow, rgba(56, 189, 248, 0.25))',
+              bg: 'var(--space-bg, #040711)',
+              surface: 'var(--space-surface, rgba(10, 15, 29, 0.82))',
+              card: 'var(--space-card, rgba(13, 20, 38, 0.72))',
+              cardSubtle: 'var(--space-card-subtle, rgba(20, 30, 56, 0.55))',
+              border: 'var(--space-border, rgba(148, 163, 184, 0.16))',
+            }
+          },
+          boxShadow: {
+            'space-sm': '0 0 14px var(--space-glow)',
+            'space-lg': '0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px var(--space-glow)',
+            'float-card': '0 20px 45px -12px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.18)',
+          },
+          animation: {
+            'stellar-drift': 'stellarDrift 20s ease-in-out infinite alternate',
+            'float-smooth': 'floatSmooth 6s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+            'pop-in': 'popIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            stellarDrift: {
+              '0%': { transform: 'scale(1) translate(0, 0)' },
+              '100%': { transform: 'scale(1.04) translate(-10px, -15px)' }
+            },
+            floatSmooth: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            popIn: {
+              '0%': { opacity: '0', transform: 'translateY(12px) scale(0.96)' },
+              '100%': { opacity: '1', transform: 'translateY(0) scale(1)' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --space-accent: #38bdf8;
+      --space-accent-hover: #0ea5e9;
+      --space-glow: rgba(56, 189, 248, 0.22);
+      --space-bg: #030611;
+      --space-surface: rgba(9, 14, 27, 0.82);
+      --space-card: rgba(13, 20, 38, 0.74);
+      --space-card-subtle: rgba(21, 31, 56, 0.58);
+      --space-border: rgba(148, 163, 184, 0.14);
+      --space-border-glow: rgba(56, 189, 248, 0.3);
+    }
+
+    body {
+      background-color: var(--space-bg);
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .galaxy-backdrop {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(ellipse at 85% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 45%),
+        radial-gradient(ellipse at 15% 80%, rgba(14, 165, 233, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.75) 0%, #030611 90%),
+        url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=2200&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+      mix-blend-mode: screen;
+    }
+
+    .space-vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 40%, rgba(2, 6, 18, 0.82) 90%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .brand-3d-text {
+      font-family: 'Silkscreen', 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 1.45rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #e0f2fe 0%, #7dd3fc 32%, #0284c7 70%, #034f77 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: 
+        drop-shadow(0 1px 0px #0369a1)
+        drop-shadow(0 2px 0px #075985)
+        drop-shadow(0 3px 0px #0c4a6e)
+        drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6))
+        drop-shadow(0 6px 14px rgba(2, 132, 199, 0.35));
+      image-rendering: pixelated;
+    }
+
+    @media (min-width: 640px) {
+      .brand-3d-text { font-size: 1.85rem; }
+    }
+
+    .pill-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1;
+      border: 1px solid transparent;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+    }
+
+    .pill-HT1 { background: rgba(234, 179, 8, 0.14); border-color: rgba(234, 179, 8, 0.45); color: #fde047; box-shadow: 0 0 12px rgba(234, 179, 8, 0.22); }
+    .pill-LT1 { background: rgba(202, 138, 4, 0.12); border-color: rgba(202, 138, 4, 0.38); color: #facc15; }
+    .pill-HT2 { background: rgba(148, 163, 184, 0.14); border-color: rgba(203, 213, 225, 0.4); color: #f1f5f9; box-shadow: 0 0 10px rgba(226, 232, 240, 0.15); }
+    .pill-LT2 { background: rgba(100, 116, 139, 0.12); border-color: rgba(148, 163, 184, 0.28); color: #cbd5e1; }
+    .pill-HT3 { background: rgba(180, 83, 9, 0.15); border-color: rgba(217, 119, 6, 0.4); color: #fbbf24; }
+    .pill-LT3 { background: rgba(146, 64, 14, 0.12); border-color: rgba(180, 83, 9, 0.3); color: #f59e0b; }
+    .pill-HT4 { background: rgba(51, 65, 85, 0.3); border-color: rgba(100, 116, 139, 0.35); color: #94a3b8; }
+    .pill-LT4 { background: rgba(30, 41, 59, 0.35); border-color: rgba(71, 85, 105, 0.3); color: #64748b; }
+    .pill-HT5 { background: rgba(15, 23, 42, 0.5); border-color: rgba(51, 65, 85, 0.4); color: #64748b; }
+    .pill-LT5 { background: rgba(15, 23, 42, 0.4); border-color: rgba(30, 41, 59, 0.4); color: #475569; }
+    .pill-UNRANKED { background: rgba(15, 23, 42, 0.25); border-color: rgba(30, 41, 59, 0.35); color: #475569; font-style: italic; }
+
+    .title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 0.5rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    .title-grandmaster { background: linear-gradient(135deg, rgba(234, 179, 8, 0.22), rgba(250, 204, 21, 0.08)); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.8); box-shadow: 0 0 14px rgba(234, 179, 8, 0.25); }
+    .title-master { background: linear-gradient(135deg, rgba(202, 138, 4, 0.18), rgba(234, 179, 8, 0.05)); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.5); }
+    .title-ace { background: linear-gradient(135deg, rgba(244, 63, 94, 0.18), rgba(251, 113, 133, 0.05)); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.55); box-shadow: 0 0 12px rgba(244, 63, 94, 0.2); }
+    .title-specialist { background: linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(192, 132, 252, 0.05)); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.5); box-shadow: 0 0 10px rgba(168, 85, 247, 0.18); }
+    .title-cadet { background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(129, 140, 248, 0.05)); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.45); }
+    .title-novice { background: linear-gradient(135deg, rgba(71, 85, 105, 0.24), rgba(100, 116, 139, 0.05)); color: #cbd5e1; border: 1px solid rgba(100, 116, 139, 0.4); }
+    .title-rookie { background: rgba(30, 41, 59, 0.4); color: #64748b; border: 1px solid rgba(51, 65, 85, 0.4); }
+
+    @keyframes flowUpCosmic {
+      0% { opacity: 0; transform: translateY(24px) scale(0.975); filter: blur(5px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+    }
+
+    .animate-flow-col { animation: flowUpCosmic 0.48s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .tier-col-1 { animation-delay: 0.04s; }
+    .tier-col-2 { animation-delay: 0.10s; }
+    .tier-col-3 { animation-delay: 0.16s; }
+    .tier-col-4 { animation-delay: 0.22s; }
+    .tier-col-5 { animation-delay: 0.28s; }
+
+    .tier-column-card {
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+    }
+    .tier-column-card:hover {
+      transform: translateX(4px) translateY(-1px);
+      background-color: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.7), 0 0 14px rgba(56, 189, 248, 0.18);
+    }
+
+    .col-hdr-tier1 { background: linear-gradient(180deg, rgba(161, 98, 7, 0.4) 0%, rgba(69, 39, 5, 0.55) 100%); color: #facc15; border-bottom: 2px solid rgba(234, 179, 8, 0.55); text-shadow: 0 2px 8px rgba(234, 179, 8, 0.25); }
+    .col-hdr-tier2 { background: linear-gradient(180deg, rgba(100, 116, 139, 0.32) 0%, rgba(51, 65, 85, 0.5) 100%); color: #e2e8f0; border-bottom: 2px solid rgba(203, 213, 225, 0.45); }
+    .col-hdr-tier3 { background: linear-gradient(180deg, rgba(146, 64, 14, 0.35) 0%, rgba(67, 30, 9, 0.5) 100%); color: #fb923c; border-bottom: 2px solid rgba(249, 115, 22, 0.45); }
+    .col-hdr-tier4 { background: linear-gradient(180deg, rgba(30, 41, 59, 0.55) 0%, rgba(15, 23, 42, 0.7) 100%); color: #94a3b8; border-bottom: 2px solid rgba(71, 85, 105, 0.45); }
+    .col-hdr-tier5 { background: linear-gradient(180deg, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.65) 100%); color: #94a3b8; border-bottom: 2px solid rgba(51, 65, 85, 0.45); }
+
+    .spacing-cozy td, .spacing-cozy th { padding-top: 0.95rem; padding-bottom: 0.95rem; }
+    .spacing-compact td, .spacing-compact th { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #030611; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--space-accent); }
+  </style>
+</head>
+<body class="relative text-slate-200 selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- Deep Space Galaxy Backdrop -->
+  <div class="galaxy-backdrop"></div>
+  <div class="space-vignette"></div>
+
+  <!-- Drifting Star Dust Particle Canvas -->
+  <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-[2] opacity-50"></canvas>
+
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl border-b border-space-border bg-space-surface transition-all shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 sm:h-20 gap-3">
+          
+          <div class="flex items-center gap-6">
+            <a href="#" class="flex items-center gap-3 group select-none">
+              <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-800 shadow-space-sm group-hover:scale-105 transition-transform duration-300">
+                <i data-lucide="swords" class="w-5 h-5 text-white stroke-[2.2]"></i>
+                <div class="absolute -inset-0.5 rounded-xl bg-sky-400 opacity-25 blur group-hover:opacity-60 transition"></div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="brandTitleText" class="brand-3d-text tracking-wider uppercase">SpaceTiers</span>
+                </div>
+                <p id="brandSubtitle" class="text-[9px] sm:text-[10px] font-mono text-slate-400 tracking-wider uppercase">Official Competitive Space Tiers Ranking</p>
+              </div>
+            </a>
+
+            <nav class="hidden lg:flex items-center space-x-1 font-mono text-xs">
+              <a href="#" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-space-card transition duration-200">
+                <i data-lucide="home" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>Home</span>
+              </a>
+
+              <a href="#rankings" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 text-sky-300 border border-sky-500/30 font-bold transition shadow-space-sm">
+                <i data-lucide="trophy" class="w-3.5 h-3.5 text-sky-400"></i>
+                <span>Rankings</span>
+              </a>
+
+              <!-- Discord Dropdown Button -->
+              <div class="relative" id="discordDropdownWrapper">
+                <button 
+                  id="discordNavBtn" 
+                  onclick="toggleDiscordPopover(event)"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-space-card border border-transparent hover:border-space-border transition duration-200 group"
+                  aria-expanded="false"
+                >
+                  <i data-lucide="message-square" class="w-3.5 h-3.5 text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                  <span>Discords</span>
+                  <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 group-hover:text-sky-400 transition-transform duration-200" id="discordChevron"></i>
+                </button>
+
+                <div 
+                  id="discordFloatingCard" 
+                  class="hidden absolute top-full left-0 mt-2 w-80 p-4 rounded-2xl bg-space-surface border border-space-border shadow-float-card backdrop-blur-2xl z-50 animate-pop-in font-mono"
+                  onclick="event.stopPropagation()"
+                >
+                  <div class="flex items-center justify-between pb-3 mb-3 border-b border-space-border">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-sm">
+                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-display text-sm font-bold text-white tracking-wider uppercase">Discord</h4>
+                        <p class="text-[10px] text-slate-400">SpaceTiers Official Hub</p>
+                      </div>
+                    </div>
+                    <button onclick="closeDiscordPopover()" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+                      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+
+                  <div class="space-y-2">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Official Invite Link</span>
+                    <div class="flex items-center gap-2 p-2 rounded-xl bg-space-bg/80 border border-space-border">
+                      <input 
+                        type="text" 
+                        id="discordInviteUrl" 
+                        readonly 
+                        value="https://discord.gg/KBAZP2BFbw" 
+                        class="bg-transparent text-xs text-sky-400 font-mono flex-1 outline-none select-all"
+                      >
+                      <button 
+                        id="discordCopyBtn"
+                        onclick="copyDiscordInvite()" 
+                        class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-[11px] uppercase tracking-wider transition active:scale-95 flex items-center gap-1 shadow-space-sm shrink-0"
+                      >
+                        <i data-lucide="copy" class="w-3.5 h-3.5 stroke-[2.2]" id="copyBtnIcon"></i>
+                        <span id="copyBtnText">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 pt-3 border-t border-space-border/60 flex items-center justify-between text-[11px]">
+                    <span class="text-slate-400 flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Tier Scrims Active
+                    </span>
+                    <a 
+                      href="https://discord.gg/KBAZP2BFbw" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      class="text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1 hover:underline"
+                    >
+                      <span>Join Server</span>
+                      <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <button onclick="openRulebookModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-space-card transition duration-200">
+                <i data-lucide="file-code" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>API Docs</span>
+              </button>
+            </nav>
+          </div>
+
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <div class="relative hidden sm:block w-48 md:w-56">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                placeholder="Search player..." 
+                oninput="syncHeaderSearch(this.value)"
+                id="headerSearchInput"
+                class="w-full pl-8 pr-7 py-1.5 rounded-xl bg-space-card border border-space-border text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 font-mono transition shadow-inner"
+              >
+              <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 border border-slate-700 rounded px-1">/</span>
+            </div>
+
+            <!-- Admin Action Group -->
+            <div id="adminActionGroup" class="hidden items-center gap-2">
+              <button onclick="openPlayerModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-heading font-bold text-xs uppercase tracking-wider shadow-space-sm transition-all active:scale-95">
+                <i data-lucide="user-plus" class="w-4 h-4 stroke-[2.2]"></i>
+                <span>Add Player</span>
+              </button>
+
+              <button onclick="openAdminManagerModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-heading font-bold text-xs uppercase tracking-wider shadow-space-sm transition-all active:scale-95">
+                <i data-lucide="users-cog" class="w-4 h-4 stroke-[2.2]"></i>
+                <span>Manage Players</span>
+              </button>
+
+              <div class="relative group">
+                <button class="p-2 rounded-xl bg-space-card border border-space-border text-slate-300 hover:text-white hover:border-sky-500/50 transition">
+                  <i data-lucide="database" class="w-4 h-4 text-sky-400"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-48 bg-space-surface border border-space-border rounded-xl shadow-float-card p-1.5 hidden group-hover:block z-50 backdrop-blur-xl font-mono text-xs">
+                  <button onclick="exportJSON()" class="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-slate-800/80 rounded-lg transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Players JSON
+                  </button>
+                  <label class="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-300 hover:bg-slate-800/80 rounded-lg cursor-pointer transition">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import Players JSON
+                    <input type="file" id="importInput" accept=".json" class="hidden" onchange="importJSON(event)">
+                  </label>
+                  <button onclick="clearAllPlayersPrompt()" class="w-full flex items-center gap-2 px-3 py-2 text-left text-rose-400 hover:bg-rose-950/40 rounded-lg transition">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Purge All Players
+                  </button>
+                </div>
+              </div>
+
+              <button onclick="toggleCustomizer()" title="Customize UI" class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-space-card border border-space-border hover:border-sky-500/50 text-slate-300 hover:text-white text-xs font-mono transition flex items-center gap-1.5">
+                <i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i>
+                <span class="hidden md:inline">CUSTOMIZE</span>
+              </button>
+            </div>
+
+            <div id="authContainer"></div>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1" id="rankings">
+      
+      <!-- Sub-Bar: Breadcrumbs & Server Radar -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3.5 sm:p-4 rounded-2xl bg-space-card border border-space-border backdrop-blur-xl shadow-lg font-mono">
+        <div class="flex items-center gap-2 text-xs sm:text-sm tracking-wider">
+          <span class="text-slate-400 uppercase font-medium">OFFICIAL RANKINGS</span>
+          <span class="text-sky-500">/</span>
+          <span id="breadcrumbCurrent" class="text-white font-bold flex items-center gap-2 uppercase tracking-widest text-sky-300 drop-shadow-[0_0_8px_var(--space-glow)]">
+            <i data-lucide="trophy" class="w-4 h-4 text-sky-400"></i>
+            <span>OVERALL TIERS</span>
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs">
+          <div class="relative flex items-center gap-2 px-3 py-1.5 rounded-xl bg-space-bg/80 border border-space-border group cursor-pointer hover:border-sky-500/60 transition duration-200" onclick="copyServerIP()">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span class="text-slate-300 font-bold" id="serverDisplayName">PvP Club Hub</span>
+            <span class="text-slate-600">|</span>
+            <span class="text-sky-400 font-bold tracking-wider" id="serverIPText">mcpvp.club</span>
+            <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition"></i>
+          </div>
+
+          <span class="hidden sm:inline-block px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold tracking-wide">
+            1.9+ REALM ONLINE
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 rounded-2xl bg-space-card border border-space-border backdrop-blur-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-display uppercase text-slate-200 flex items-center gap-2 text-xs tracking-wider">
+              <span class="text-amber-400">🏆</span> Official Tier Point Values
+            </h4>
+            <button onclick="openRulebookModal()" class="text-[10px] text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 transition">
+              <span>View Full Scale</span> <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+            <span class="pill-tier pill-HT1"><span>▲▲</span> 60 Pts (HT1)</span>
+            <span class="pill-tier pill-LT1"><span>▲</span> 45 Pts (LT1)</span>
+            <span class="pill-tier pill-HT2"><span>▲▲</span> 30 Pts (HT2)</span>
+            <span class="pill-tier pill-LT2"><span>▲</span> 20 Pts (LT2)</span>
+            <span class="pill-tier pill-HT3"><span>▲▲</span> 10 Pts (HT3)</span>
+            <span class="pill-tier pill-LT3"><span>▲</span> 6 Pts (LT3)</span>
+            <span class="pill-tier pill-HT4"><span>▲▲</span> 4 Pts</span>
+            <span class="pill-tier pill-LT4"><span>▲</span> 3 Pts</span>
+            <span class="pill-tier pill-HT5"><span>▲▲</span> 2 Pts</span>
+            <span class="pill-tier pill-LT5"><span>▲</span> 1 Pt</span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-space-card border border-space-border backdrop-blur-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-display uppercase text-slate-200 flex items-center gap-2 text-xs tracking-wider">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-sky-400"></i>
+              Combat Title Ranks
+            </h4>
+            <span class="text-[10px] text-slate-400 font-medium">Based on Total Points</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="title-badge title-grandmaster">⭐ Grandmaster 400+</span>
+            <span class="title-badge title-master">✦ Master 250+</span>
+            <span class="title-badge title-ace">♦ Ace 100+</span>
+            <span class="title-badge title-specialist">◈ Specialist 50+</span>
+            <span class="title-badge title-cadet">◎ Cadet 20+</span>
+            <span class="title-badge title-novice">◉ Novice 10+</span>
+            <span class="title-badge title-rookie">○ Rookie &lt;10</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gamemodes Navigation Tab Strip -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="gamemodeTabsBar"></div>
+
+      <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search by IGN or region..." 
+            oninput="handleSearch(this.value)"
+            class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-space-card border border-space-border text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 transition shadow-inner font-mono"
+          >
+          <button id="clearSearchBtn" onclick="clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hidden">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <div class="flex items-center gap-1 bg-space-card border border-space-border rounded-xl p-1 backdrop-blur-md">
+            <span class="text-slate-400 px-2 font-bold hidden sm:inline">REGION:</span>
+            <button onclick="setRegionFilter('ALL')" data-region="ALL" class="region-filter-btn px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition">ALL</button>
+            <button onclick="setRegionFilter('NA')" data-region="NA" class="region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">NA</button>
+            <button onclick="setRegionFilter('EU')" data-region="EU" class="region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">EU</button>
+            <button onclick="setRegionFilter('AS')" data-region="AS" class="region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">AS</button>
+            <button onclick="setRegionFilter('SA')" data-region="SA" class="region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">SA</button>
+            <button onclick="setRegionFilter('OCE')" data-region="OCE" class="region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">OCE</button>
+          </div>
+
+          <select id="tierFilterSelect" onchange="setTierFilter(this.value)" class="bg-space-card border border-space-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500 backdrop-blur-md">
+            <option value="ALL">All Tiers (HT1 - LT5)</option>
+            <option value="HT1">Tier 1: HT1 (60 Pts)</option>
+            <option value="LT1">Tier 1: LT1 (45 Pts)</option>
+            <option value="HT2">Tier 2: HT2 (30 Pts)</option>
+            <option value="LT2">Tier 2: LT2 (20 Pts)</option>
+            <option value="HT3">Tier 3: HT3 (10 Pts)</option>
+            <option value="LT3">Tier 3: LT3 (6 Pts)</option>
+            <option value="HT4">Tier 4: HT4 (4 Pts)</option>
+            <option value="LT4">Tier 4: LT4 (3 Pts)</option>
+            <option value="HT5">Tier 5: HT5 (2 Pts)</option>
+            <option value="LT5">Tier 5: LT5 (1 Pt)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 5-Column Sub-Tier Board -->
+      <div id="columnarTierBoard" class="hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 items-start">
+          <div class="animate-flow-col tier-col-1 flex flex-col rounded-2xl bg-space-card border border-amber-500/30 overflow-hidden shadow-xl backdrop-blur-xl">
+            <div class="col-hdr-tier1 px-4 py-3 flex items-center justify-between font-display font-black text-sm tracking-wider uppercase">
+              <div class="flex items-center gap-2"><span class="text-base">🏆</span><span>Tier 1</span></div>
+              <span id="badgeCountTier1" class="font-mono text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold">0</span>
+            </div>
+            <div id="colListTier1" class="p-2 space-y-1.5 min-h-[380px] max-h-[620px] overflow-y-auto font-mono text-xs"></div>
+          </div>
+
+          <div class="animate-flow-col tier-col-2 flex flex-col rounded-2xl bg-space-card border border-slate-400/25 overflow-hidden shadow-xl backdrop-blur-xl">
+            <div class="col-hdr-tier2 px-4 py-3 flex items-center justify-between font-display font-black text-sm tracking-wider uppercase">
+              <div class="flex items-center gap-2"><span class="text-base">🥈</span><span>Tier 2</span></div>
+              <span id="badgeCountTier2" class="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-300/20 text-slate-200 border border-slate-300/40 font-bold">0</span>
+            </div>
+            <div id="colListTier2" class="p-2 space-y-1.5 min-h-[380px] max-h-[620px] overflow-y-auto font-mono text-xs"></div>
+          </div>
+
+          <div class="animate-flow-col tier-col-3 flex flex-col rounded-2xl bg-space-card border border-amber-700/30 overflow-hidden shadow-xl backdrop-blur-xl">
+            <div class="col-hdr-tier3 px-4 py-3 flex items-center justify-between font-display font-black text-sm tracking-wider uppercase">
+              <div class="flex items-center gap-2"><span class="text-base">🥉</span><span>Tier 3</span></div>
+              <span id="badgeCountTier3" class="font-mono text-xs px-2 py-0.5 rounded-full bg-amber-700/20 text-amber-400 border border-amber-700/40 font-bold">0</span>
+            </div>
+            <div id="colListTier3" class="p-2 space-y-1.5 min-h-[380px] max-h-[620px] overflow-y-auto font-mono text-xs"></div>
+          </div>
+
+          <div class="animate-flow-col tier-col-4 flex flex-col rounded-2xl bg-space-card border border-slate-700/35 overflow-hidden shadow-xl backdrop-blur-xl">
+            <div class="col-hdr-tier4 px-4 py-3 flex items-center justify-between font-display font-black text-sm tracking-wider uppercase">
+              <div class="flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4 text-slate-400"></i><span>Tier 4</span></div>
+              <span id="badgeCountTier4" class="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-400 border border-slate-700 font-bold">0</span>
+            </div>
+            <div id="colListTier4" class="p-2 space-y-1.5 min-h-[380px] max-h-[620px] overflow-y-auto font-mono text-xs"></div>
+          </div>
+
+          <div class="animate-flow-col tier-col-5 flex flex-col rounded-2xl bg-space-card border border-slate-800/70 overflow-hidden shadow-xl backdrop-blur-xl">
+            <div class="col-hdr-tier5 px-4 py-3 flex items-center justify-between font-display font-black text-sm tracking-wider uppercase">
+              <div class="flex items-center gap-2"><i data-lucide="shield-off" class="w-4 h-4 text-slate-500"></i><span>Tier 5</span></div>
+              <span id="badgeCountTier5" class="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-500 border border-slate-700 font-bold">0</span>
+            </div>
+            <div id="colListTier5" class="p-2 space-y-1.5 min-h-[380px] max-h-[620px] overflow-y-auto font-mono text-xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Overall Table (Inspect/Actions removed & Tiers widened) -->
+      <div id="overallTableWrapper" class="relative bg-space-surface border border-space-border rounded-2xl shadow-2xl overflow-hidden backdrop-blur-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm font-sans" id="mainLeaderboardTable">
+            <thead>
+              <tr class="bg-space-cardSubtle text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-space-border select-none">
+                <th class="px-4 py-3.5 text-center w-16 cursor-pointer hover:text-sky-300 transition" onclick="toggleSort('rank')">
+                  <div class="flex items-center justify-center gap-1">
+                    <span>Rank</span>
+                    <i data-lucide="chevrons-up-down" class="w-3 h-3 text-slate-500"></i>
+                  </div>
+                </th>
+                <th class="px-4 py-3.5">Player Profile</th>
+                <th class="px-4 py-3.5 text-center w-24">Region</th>
+                <th class="px-4 py-3.5 text-center cursor-pointer hover:text-sky-300 transition" onclick="toggleSort('points')">
+                  <div class="flex items-center justify-center gap-1">
+                    <span id="colHeaderPoints">Total Points</span>
+                    <i data-lucide="chevrons-up-down" class="w-3 h-3 text-slate-500"></i>
+                  </div>
+                </th>
+                <th class="px-4 py-3.5 text-center">Tiers</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody" class="divide-y divide-space-border/50 font-mono"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyLeaderboardState" class="py-20 px-4 text-center">
+          <div class="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mb-5 shadow-space-lg animate-float-smooth">
+            <i data-lucide="shield-alert" class="w-10 h-10"></i>
+            <div class="absolute -inset-1 rounded-2xl bg-sky-500 opacity-20 blur-md"></div>
+          </div>
+          <h3 class="font-display text-lg sm:text-xl font-black text-white tracking-widest uppercase">SpaceTiers Registry Empty</h3>
+          <p class="text-xs sm:text-sm text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
+            No competitive players have been certified in this database yet. Certified tier testers can log officially tested players below.
+          </p>
+
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="requestAdminAuthPrompt()" class="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-heading font-bold text-xs uppercase tracking-wider shadow-space-sm transition-all active:scale-95 flex items-center gap-2">
+              <i data-lucide="lock" class="w-4 h-4 stroke-[2.2]"></i>
+              <span>Admin Login to Add Players</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-space-border bg-space-surface/90 py-4 text-center text-xs font-mono text-slate-400 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          <span>Official SpaceTiers Tier Testing Matrix & Points Database</span>
+        </div>
+        <div class="text-[11px] text-slate-500">
+          Authorized Administrator: <code class="text-sky-400 font-semibold">GlobalizedMC</code>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Admin Player Management Modal -->
+  <div id="adminManagerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-3xl bg-space-surface border border-space-border rounded-2xl shadow-space-lg overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-space-border flex items-center justify-between bg-space-card">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <i data-lucide="users-cog" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-display text-sm font-bold text-white uppercase tracking-wider">Admin Player Manager</h3>
+            <p class="text-[10px] font-mono text-amber-400">Manage, Remake Tiers, or Delete Players</p>
+          </div>
+        </div>
+        <button onclick="closeAdminManagerModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-3 font-mono text-xs flex-1" id="adminPlayerManagerList"></div>
+
+      <div class="p-4 border-t border-space-border bg-space-card flex justify-end">
+        <button onclick="closeAdminManagerModal()" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold uppercase tracking-wider transition">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rulebook Modal -->
+  <div id="rulebookModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl bg-space-surface border border-space-border rounded-2xl shadow-space-lg overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
+      <div class="p-4 sm:p-5 border-b border-space-border flex items-center justify-between bg-space-card">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="book-open" class="w-5 h-5 text-sky-400"></i>
+          <h3 class="font-display text-sm sm:text-base font-bold text-white uppercase tracking-wider">Official SpaceTiers Scoring & Combat Hierarchy</h3>
+        </div>
+        <button onclick="closeRulebookModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-6 overflow-y-auto font-mono text-xs text-slate-300">
+        <div>
+          <h4 class="font-display uppercase text-sky-400 tracking-wider text-xs mb-3 flex items-center gap-2">
+            <span>🏆</span> 1. Gamemode Tier Point Allocation
+          </h4>
+          <p class="text-[11px] text-slate-400 mb-3">Each certified tier test in any gamemode awards fixed ranking points:</p>
+          
+          <div class="space-y-2">
+            <div class="p-3 rounded-xl bg-space-card border border-amber-500/30 flex items-center justify-between">
+              <span class="text-amber-400 font-bold text-sm">🏆 Tier 1</span>
+              <div class="flex items-center gap-2">
+                <span class="pill-tier pill-HT1"><span>▲▲</span> 60 Points (HT1)</span>
+                <span class="pill-tier pill-LT1"><span>▲</span> 45 Points (LT1)</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-space-card border border-slate-400/30 flex items-center justify-between">
+              <span class="text-slate-300 font-bold text-sm">🥈 Tier 2</span>
+              <div class="flex items-center gap-2">
+                <span class="pill-tier pill-HT2"><span>▲▲</span> 30 Points (HT2)</span>
+                <span class="pill-tier pill-LT2"><span>▲</span> 20 Points (LT2)</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-space-card border border-amber-700/30 flex items-center justify-between">
+              <span class="text-amber-600 font-bold text-sm">🥉 Tier 3</span>
+              <div class="flex items-center gap-2">
+                <span class="pill-tier pill-HT3"><span>▲▲</span> 10 Points (HT3)</span>
+                <span class="pill-tier pill-LT3"><span>▲</span> 6 Points (LT3)</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-space-card border border-slate-700/40 flex items-center justify-between">
+              <span class="text-slate-400 font-bold text-sm">Tier 4</span>
+              <div class="flex items-center gap-2">
+                <span class="pill-tier pill-HT4"><span>▲▲</span> 4 Points (HT4)</span>
+                <span class="pill-tier pill-LT4"><span>▲</span> 3 Points (LT4)</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-space-card border border-slate-800 flex items-center justify-between">
+              <span class="text-slate-500 font-bold text-sm">Tier 5</span>
+              <div class="flex items-center gap-2">
+                <span class="pill-tier pill-HT5"><span>▲▲</span> 2 Points (HT5)</span>
+                <span class="pill-tier pill-LT5"><span>▲</span> 1 Point (LT5)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-display uppercase text-sky-400 tracking-wider text-xs mb-3 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            2. Combat Title Ranks
+          </h4>
+          <p class="text-[11px] text-slate-400 mb-3">Overall standing evaluates total points accumulated across all 9 gamemodes:</p>
+
+          <div class="space-y-2">
+            <div class="p-2.5 rounded-xl bg-space-card border border-yellow-500/30 flex items-center justify-between">
+              <span class="title-badge title-grandmaster">⭐ Combat Grandmaster</span>
+              <span class="text-yellow-400 font-bold">400+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-yellow-600/30 flex items-center justify-between">
+              <span class="title-badge title-master">✦ Combat Master</span>
+              <span class="text-yellow-500 font-bold">250+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-rose-500/30 flex items-center justify-between">
+              <span class="title-badge title-ace">♦ Combat Ace</span>
+              <span class="text-rose-400 font-bold">100+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-purple-500/30 flex items-center justify-between">
+              <span class="title-badge title-specialist">◈ Combat Specialist</span>
+              <span class="text-purple-400 font-bold">50+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-indigo-500/30 flex items-center justify-between">
+              <span class="title-badge title-cadet">◎ Combat Cadet</span>
+              <span class="text-indigo-400 font-bold">20+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-slate-500/30 flex items-center justify-between">
+              <span class="title-badge title-novice">◉ Combat Novice</span>
+              <span class="text-slate-300 font-bold">10+ total points</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-space-card border border-slate-700/30 flex items-center justify-between">
+              <span class="title-badge title-rookie">○ Rookie</span>
+              <span class="text-slate-500 font-bold">&lt; 10 points</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="loginModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-md bg-space-surface border border-space-border rounded-2xl shadow-space-lg overflow-hidden animate-pop-in">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent"></div>
+      
+      <div class="p-6 sm:p-7 space-y-5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-display text-base font-bold text-white uppercase tracking-wider">Staff Terminal Access</h3>
+              <p class="text-xs font-mono text-slate-400">Official Admin Credentials Required</p>
+            </div>
+          </div>
+          <button onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4 font-mono">
+          <div>
+            <label class="block text-xs text-slate-300 mb-1.5 uppercase tracking-wider">Admin Username</label>
+            <div class="relative">
+              <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="loginUsername" 
+                required 
+                placeholder="GlobalizedMC" 
+                class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-space-bg border border-space-border text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-300 mb-1.5 uppercase tracking-wider">Password</label>
+            <div class="relative">
+              <i data-lucide="key-round" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="password" 
+                id="loginPassword" 
+                required 
+                placeholder="••••••••••••" 
+                class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-space-bg border border-space-border text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500"
+              >
+            </div>
+          </div>
+
+          <div id="loginErrorMsg" class="hidden p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs text-center">
+            Invalid credentials. Access denied.
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-heading font-black text-sm uppercase tracking-widest shadow-space-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+          >
+            <i data-lucide="unlock" class="w-4 h-4 stroke-[2.2]"></i>
+            <span>Authenticate GlobalizedMC</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Modal (Admin Add / Edit) -->
+  <div id="playerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-xl bg-space-surface border border-space-border rounded-2xl shadow-space-lg overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-space-border flex items-center justify-between bg-space-card">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="playerModalTitle" class="font-display text-sm font-bold text-white uppercase tracking-wider">Register / Certify Player</h3>
+            <p class="text-[10px] font-mono text-sky-400">Admin Session: GlobalizedMC</p>
+          </div>
+        </div>
+        <button onclick="closePlayerModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="playerForm" onsubmit="handleSavePlayer(event)" class="p-6 space-y-4 overflow-y-auto font-mono text-xs">
+        <input type="hidden" id="formPlayerId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-300 mb-1.5 uppercase">Minecraft IGN *</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="formIgn" 
+                required 
+                placeholder="e.g. ClownPierce" 
+                class="w-full pl-3 pr-9 py-2.5 rounded-xl bg-space-bg border border-space-border text-white focus:outline-none focus:border-sky-500 text-xs"
+                oninput="updateAvatarLive(this.value)"
+              >
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded overflow-hidden border border-space-border">
+                <img id="formAvatarLive" src="https://mc-heads.net/avatar/steve/24" class="w-full h-full object-cover">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 mb-1.5 uppercase">Region *</label>
+            <select id="formRegion" class="w-full px-3 py-2.5 rounded-xl bg-space-bg border border-space-border text-white focus:outline-none focus:border-sky-500 text-xs">
+              <option value="NA">NA (North America)</option>
+              <option value="EU">EU (Europe)</option>
+              <option value="AS">AS (Asia)</option>
+              <option value="SA">SA (South America)</option>
+              <option value="OCE">OCE (Oceania)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <label class="block font-display uppercase tracking-wider text-sky-400 mb-2 text-[11px]">Certified Gamemode Tiers</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="formGamemodeInputs"></div>
+        </div>
+
+        <div class="pt-4 border-t border-space-border flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closePlayerModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:bg-slate-700 transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-heading font-black uppercase tracking-wider shadow-space-sm transition-all active:scale-95">
+            Save Player
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Redesigned Template-Accurate Player Inspect Modal -->
+  <div id="playerInspectModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4">
+    <div id="inspectContainerCard" class="relative w-full max-w-[590px] bg-[#090d18]/95 border border-sky-500/30 rounded-[28px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(56,189,248,0.2)] overflow-hidden animate-pop-in flex flex-col max-h-[94vh] font-sans">
+      
+      <!-- Top-right Atmospheric Blue Glow -->
+      <div id="inspectBackdropGlow" class="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-sky-500/20 blur-3xl pointer-events-none transition-colors duration-500"></div>
+
+      <!-- Modal Header Bar -->
+      <div class="relative pt-6 px-6 sm:px-7 flex items-start justify-between z-10">
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#0e1628] border border-sky-500/30 p-1.5 shadow-xl flex items-center justify-center overflow-hidden">
+              <img id="inspectAvatar" src="https://mc-heads.net/avatar/steve/64" alt="Skin" class="w-full h-full object-cover rounded-xl">
+            </div>
+            <div id="inspectCrownBadge" class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-sky-400 text-slate-950 font-bold text-[11px] flex items-center justify-center border-2 border-[#090d18] shadow-md">
+              👑
+            </div>
+          </div>
+
+          <div>
+            <div id="inspectCombatTitleSub" class="text-[10px] font-mono tracking-widest uppercase font-bold text-sky-400 flex items-center gap-1">
+              <span>◆</span>
+              <span id="inspectCombatTitleText">COMBAT SPECIALIST</span>
+            </div>
+            <h2 id="inspectIgn" class="font-serif text-2xl sm:text-3xl font-black text-white tracking-wide mt-0.5 leading-tight">Player</h2>
+            
+            <div class="flex items-center gap-2 mt-1 text-[11px] font-mono text-slate-300">
+              <span class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                <span id="inspectRegionText">AS/AU</span>
+              </span>
+              <span class="text-slate-600">·</span>
+              <span class="flex items-center gap-1 text-slate-300">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sky-400"></i>
+                <span class="uppercase tracking-wider text-[10px] font-semibold">VERIFIED</span>
+              </span>
+            </div>
+            <div id="inspectHexCode" class="text-[9px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">SP-920DC04B</div>
+          </div>
+        </div>
+
+        <button onclick="closeInspectModal()" class="w-8 h-8 rounded-full bg-[#0e1628] border border-space-border hover:border-sky-500 text-slate-400 hover:text-white flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Middle: Stats & Skill Spectrum Radar Chart -->
+      <div class="relative px-6 sm:px-7 pt-5 pb-2 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center z-10">
+        <div class="sm:col-span-6 space-y-4">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-[#0b1222]/90 border border-space-border rounded-2xl p-2.5 text-center shadow-inner">
+              <div id="inspectGlobalRank" class="font-serif text-lg sm:text-xl font-bold text-white">#1</div>
+              <div class="text-[9px] font-mono text-slate-400 tracking-wider uppercase mt-0.5">GLOBAL</div>
+            </div>
+            <div class="bg-[#0b1222]/90 border border-space-border rounded-2xl p-2.5 text-center shadow-inner">
+              <div id="inspectPointsCount" class="font-serif text-lg sm:text-xl font-bold text-sky-400">0</div>
+              <div class="text-[9px] font-mono text-slate-400 tracking-wider uppercase mt-0.5">POINTS</div>
+            </div>
+            <div class="bg-[#0b1222]/90 border border-space-border rounded-2xl p-2.5 text-center shadow-inner">
+              <div id="inspectModesCount" class="font-serif text-lg sm:text-xl font-bold text-white">8</div>
+              <div class="text-[9px] font-mono text-slate-400 tracking-wider uppercase mt-0.5">MODES</div>
+            </div>
+          </div>
+
+          <div class="text-xs font-sans text-slate-300 space-y-1 pl-1">
+            <p id="inspectRankedSummary" class="text-slate-400">Ranked across <strong class="text-slate-200">8</strong> of nine combat disciplines.</p>
+            <p id="inspectStrongestSummary">Strongest in <strong class="text-white" id="inspectStrongestMode">Sword</strong> at <span class="font-mono font-bold text-sky-400" id="inspectStrongestTier">HT3</span>.</p>
+          </div>
+        </div>
+
+        <div class="sm:col-span-6 flex flex-col items-center justify-center">
+          <div class="text-[9px] font-mono tracking-widest uppercase text-sky-400 mb-1">SKILL SPECTRUM</div>
+          <div id="inspectRadarChart" class="w-full max-w-[210px] aspect-square flex items-center justify-center relative"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Disciplines Section -->
+      <div class="px-6 sm:px-7 pt-2 pb-5 z-10">
+        <div class="text-[9px] font-mono tracking-widest uppercase text-slate-400 mb-2.5">DISCIPLINES</div>
+        <div id="inspectDisciplinesGrid" class="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="p-4 sm:p-5 pt-0 flex items-center justify-between gap-3 z-10 border-t border-space-border mt-auto">
+        <a id="inspectNameMcLink" href="#" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-2xl bg-[#0b1222] border border-space-border hover:border-sky-500 text-slate-300 hover:text-white font-mono text-xs font-semibold tracking-wider uppercase transition flex items-center gap-1.5">
+          <span>NAMEMC</span>
+          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </a>
+
+        <button id="inspectCloseBtn" onclick="closeInspectModal()" class="flex-1 max-w-[210px] py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono text-xs font-bold uppercase tracking-widest transition shadow-space-sm text-center">
+          CLOSE
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Admin UI Customizer Drawer -->
+  <aside id="customizerDrawer" class="fixed top-0 right-0 h-full w-80 max-w-full bg-space-surface border-l border-space-border shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col font-mono text-xs backdrop-blur-2xl">
+    <div class="p-4 border-b border-space-border flex items-center justify-between bg-space-card">
+      <div class="flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i>
+        <h3 class="font-display font-bold text-white uppercase tracking-wider">Space UI Customizer</h3>
+      </div>
+      <button onclick="toggleCustomizer()" class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="p-5 overflow-y-auto space-y-6 flex-1">
+      <div>
+        <label class="block uppercase text-slate-300 mb-2">Cosmic Accent Color</label>
+        <div class="grid grid-cols-5 gap-2 mb-3">
+          <button onclick="setSpaceAccent('#38bdf8', 'rgba(56, 189, 248, 0.25)')" title="Celestial Blue" class="h-8 rounded-lg bg-sky-400 border border-white/20 hover:scale-105 transition"></button>
+          <button onclick="setSpaceAccent('#818cf8', 'rgba(129, 140, 248, 0.25)')" title="Deep Indigo" class="h-8 rounded-lg bg-indigo-400 border border-white/20 hover:scale-105 transition"></button>
+          <button onclick="setSpaceAccent('#34d399', 'rgba(52, 211, 153, 0.25)')" title="Aurora Emerald" class="h-8 rounded-lg bg-emerald-400 border border-white/20 hover:scale-105 transition"></button>
+          <button onclick="setSpaceAccent('#c084fc', 'rgba(192, 132, 252, 0.25)')" title="Nebula Purple" class="h-8 rounded-lg bg-purple-400 border border-white/20 hover:scale-105 transition"></button>
+          <button onclick="setSpaceAccent('#fbbf24', 'rgba(251, 191, 36, 0.25)')" title="Stellar Gold" class="h-8 rounded-lg bg-amber-400 border border-white/20 hover:scale-105 transition"></button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block uppercase text-slate-300 mb-1.5">Platform Brand Title</label>
+        <input 
+          type="text" 
+          id="customTitleInput" 
+          value="SpaceTiers" 
+          oninput="updatePlatformTitle(this.value)"
+          class="w-full px-3 py-2 rounded-xl bg-space-card border border-space-border text-white focus:outline-none focus:border-sky-500 uppercase"
+        >
+      </div>
+
+      <div class="space-y-3">
+        <label class="block uppercase text-slate-300">Server Radar IP Widget</label>
+        <div>
+          <label class="text-[10px] text-slate-500">SERVER TITLE</label>
+          <input 
+            type="text" 
+            id="customServerNameInput" 
+            value="PvP Club Hub" 
+            oninput="updateServerInfo(this.value, null)"
+            class="w-full px-3 py-1.5 rounded-lg bg-space-card border border-space-border text-white focus:border-sky-500 text-xs"
+          >
+        </div>
+        <div>
+          <label class="text-[10px] text-slate-500">ADDRESS / IP</label>
+          <input 
+            type="text" 
+            id="customServerIpInput" 
+            value="mcpvp.club" 
+            oninput="updateServerInfo(null, this.value)"
+            class="w-full px-3 py-1.5 rounded-lg bg-space-card border border-space-border text-white focus:border-sky-500 text-xs"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label class="block uppercase text-slate-300 mb-2">Table Density</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-space-card rounded-xl border border-space-border">
+          <button onclick="setTableDensity('spacing-compact')" id="btnDensityCompact" class="py-1 rounded-lg text-slate-400 hover:text-white transition">Compact</button>
+          <button onclick="setTableDensity('spacing-cozy')" id="btnDensityCozy" class="py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition">Cozy</button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between p-3 rounded-xl bg-space-card border border-space-border">
+        <span>Stardust Field FX</span>
+        <input type="checkbox" id="particleToggle" checked onchange="toggleParticles(this.checked)" class="w-4 h-4 accent-sky-400 cursor-pointer">
+      </div>
+    </div>
+  </aside>
+
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-space-surface border border-sky-500/40 text-white text-xs font-mono shadow-space-lg flex items-center gap-2 transform translate-y-24 opacity-0 transition duration-300 pointer-events-none backdrop-blur-xl">
+    <i data-lucide="check-circle" class="w-4 h-4 text-sky-400" id="toastIcon"></i>
+    <span id="toastMessage">Action completed</span>
+  </div>
+
+  <script>
+    const GAMEMODES = [
+      { id: 'overall', name: 'Overall', icon: 'trophy', isOverall: true, desc: 'Calculated global standings across all combat modes' },
+      { id: 'vanilla', name: 'Vanilla', icon: 'hexagon', desc: '1.9+ shield, sword, axe & end crystal meta duels' },
+      { id: 'uhc', name: 'UHC', icon: 'heart', desc: 'Ultra Hardcore golden head & rod rules' },
+      { id: 'pot', name: 'Pot', icon: 'flask-conical', desc: 'Splash health & speed potion combat' },
+      { id: 'nethop', name: 'NethOP', icon: 'flame', desc: 'Full Netherite God set OP duels' },
+      { id: 'smp', name: 'SMP', icon: 'disc', desc: 'Survival multiplayer combat meta' },
+      { id: 'sword', name: 'Sword', icon: 'sword', desc: 'Pure 1.9+ sword mechanics & spacing' },
+      { id: 'axe', name: 'Axe', icon: 'hammer', desc: 'Axe shield break & critical hits' },
+      { id: 'mace', name: 'Mace', icon: 'zap', desc: 'Mace smash attack & wind charge mobility' }
+    ];
+
+    const TIER_SCALE = {
+      'HT1': { name: 'HT1', points: 60, chevron: '▲▲', label: '60 Points', group: 1 },
+      'LT1': { name: 'LT1', points: 45, chevron: '▲', label: '45 Points', group: 1 },
+      'HT2': { name: 'HT2', points: 30, chevron: '▲▲', label: '30 Points', group: 2 },
+      'LT2': { name: 'LT2', points: 20, chevron: '▲', label: '20 Points', group: 2 },
+      'HT3': { name: 'HT3', points: 10, chevron: '▲▲', label: '10 Points', group: 3 },
+      'LT3': { name: 'LT3', points: 6, chevron: '▲', label: '6 Points', group: 3 },
+      'HT4': { name: 'HT4', points: 4, chevron: '▲▲', label: '4 Points', group: 4 },
+      'LT4': { name: 'LT4', points: 3, chevron: '▲', label: '3 Points', group: 4 },
+      'HT5': { name: 'HT5', points: 2, chevron: '▲▲', label: '2 Points', group: 5 },
+      'LT5': { name: 'LT5', points: 1, chevron: '▲', label: '1 Point', group: 5 },
+      'UNRANKED': { name: 'Unranked', points: 0, chevron: '-', label: '0 Points', group: 0 }
+    };
+
+    const DISCIPLINE_ICONS = {
+      vanilla: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><polygon points="12,2 21,7.5 21,16.5 12,22 3,16.5 3,7.5" stroke="#f8fafc" stroke-width="2" stroke-linejoin="round" fill="none"/><circle cx="12" cy="12" r="4.8" fill="#c084fc"/><circle cx="12" cy="12" r="2.2" fill="#f472b6"/></svg>`,
+      nethop: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><path d="M5 10C5 6 8 3 12 3C16 3 19 6 19 10V18L16 16V13H8V16L5 18V10Z" fill="#a855f7" stroke="#9333ea" stroke-width="1.3"/><rect x="9" y="10" width="6" height="2" fill="#030712"/></svg>`,
+      smp: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><circle cx="12" cy="12" r="9.5" fill="#042f2e" stroke="#0d9488" stroke-width="1.6"/><circle cx="12" cy="12" r="6.2" fill="#115e59"/><circle cx="9.5" cy="9.5" r="2.2" fill="#34d399"/></svg>`,
+      pot: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><path d="M10 3H14V6L19 14C20 16 19 19 16 20H8C5 20 4 16 5 14L10 6V3Z" stroke="#f8fafc" stroke-width="1.6" fill="#1e1b4b"/><path d="M6.5 15C7.5 14.5 9 14 12 14C15 14 16.5 14.5 17.5 15C18.5 16.5 17.5 19 15.5 19.5H8.5C6.5 19 5.5 16.5 6.5 15Z" fill="#f43f5e"/></svg>`,
+      sword: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><path d="M18.5 3.5L20.5 5.5L11 15L9 13L18.5 3.5Z" fill="#38bdf8"/><path d="M8 14L10 16L7 19L5 17L8 14Z" fill="#64748b"/><path d="M4 20L6 18L4 16L2 18L4 20Z" fill="#0284c7"/></svg>`,
+      mace: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><rect x="11" y="9" width="10" height="10" rx="1.5" transform="rotate(-45 11 9)" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/><line x1="5" y1="19" x2="11" y2="13" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+      uhc: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+      axe: `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none"><path d="M14 4C17 4 19 6 20 8L15 13C14 12 13 10 13 8V4H14Z" fill="#38bdf8"/><line x1="6" y1="20" x2="15" y2="9" stroke="#92400e" stroke-width="2.5" stroke-linecap="round"/></svg>`
+    };
+
+    function getCombatTitle(totalPoints) {
+      if (totalPoints >= 400) return { title: 'Combat Grandmaster', desc: 'Obtained 400+ total points.', class: 'title-grandmaster', icon: '⭐' };
+      if (totalPoints >= 250) return { title: 'Combat Master', desc: 'Obtained 250+ total points.', class: 'title-master', icon: '✦' };
+      if (totalPoints >= 100) return { title: 'Combat Ace', desc: 'Obtained 100+ total points.', class: 'title-ace', icon: '♦' };
+      if (totalPoints >= 50) return { title: 'Combat Specialist', desc: 'Obtained 50+ total points.', class: 'title-specialist', icon: '◈' };
+      if (totalPoints >= 20) return { title: 'Combat Cadet', desc: 'Obtained 20+ total points.', class: 'title-cadet', icon: '◎' };
+      if (totalPoints >= 10) return { title: 'Combat Novice', desc: 'Obtained 10+ total points.', class: 'title-novice', icon: '◉' };
+      return { title: 'Rookie', desc: 'Starting rank for players with less than 10 points.', class: 'title-rookie', icon: '○' };
+    }
+
+    let players = [];
+    let currentGamemode = 'overall';
+    let currentRegion = 'ALL';
+    let currentTierFilter = 'ALL';
+    let searchQuery = '';
+    let sortField = 'rank';
+    let sortAsc = true;
+    let isAdminLoggedIn = false;
+    let particlesEnabled = true;
+
+    const ADMIN_USER = 'GlobalizedMC';
+    const ADMIN_PASS = 'Kangsom1!';
+
+    function copyTextFallback(text) {
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try { document.execCommand('copy'); } catch (err) {}
+      document.body.removeChild(tempInput);
+    }
+
+    function toggleDiscordPopover(event) {
+      if (event) event.stopPropagation();
+      const card = document.getElementById('discordFloatingCard');
+      const chevron = document.getElementById('discordChevron');
+      const isClosed = card.classList.contains('hidden');
+
+      if (isClosed) {
+        card.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+      } else {
+        closeDiscordPopover();
+      }
+    }
+
+    function closeDiscordPopover() {
+      const card = document.getElementById('discordFloatingCard');
+      const chevron = document.getElementById('discordChevron');
+      if (card) card.classList.add('hidden');
+      if (chevron) chevron.classList.remove('rotate-180');
+    }
+
+    function copyDiscordInvite() {
+      const inviteUrl = 'https://discord.gg/KBAZP2BFbw';
+      copyTextFallback(inviteUrl);
+
+      const btnText = document.getElementById('copyBtnText');
+      const btnIcon = document.getElementById('copyBtnIcon');
+      const copyBtn = document.getElementById('discordCopyBtn');
+
+      btnText.textContent = 'Copied!';
+      btnIcon.setAttribute('data-lucide', 'check');
+      copyBtn.classList.remove('bg-sky-500');
+      copyBtn.classList.add('bg-emerald-400');
+      lucide.createIcons();
+
+      showToast('Discord invite link copied to clipboard!');
+
+      setTimeout(() => {
+        btnText.textContent = 'Copy';
+        btnIcon.setAttribute('data-lucide', 'copy');
+        copyBtn.classList.remove('bg-emerald-400');
+        copyBtn.classList.add('bg-sky-500');
+        lucide.createIcons();
+      }, 2200);
+    }
+
+    function copyServerIP() {
+      const ip = document.getElementById('serverIPText').textContent || 'mcpvp.club';
+      copyTextFallback(ip);
+      showToast(`Copied server IP: ${ip}`);
+    }
+
+    function initAuth() {
+      const session = sessionStorage.getItem('spacetiers_admin_session');
+      isAdminLoggedIn = session === 'GlobalizedMC_AUTHENTICATED';
+      renderAuthUI();
+    }
+
+    function renderAuthUI() {
+      const authContainer = document.getElementById('authContainer');
+      const adminActionGroup = document.getElementById('adminActionGroup');
+
+      if (isAdminLoggedIn) {
+        adminActionGroup.classList.remove('hidden');
+        adminActionGroup.classList.add('flex');
+        authContainer.innerHTML = `
+          <div class="flex items-center gap-2 bg-space-card border border-sky-500/30 px-3 py-1.5 rounded-xl shadow-space-sm backdrop-blur-md">
+            <div class="flex items-center gap-1.5 text-xs font-mono">
+              <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+              <span class="text-white font-bold tracking-wider">${ADMIN_USER}</span>
+              <span class="text-[9px] px-1 py-0.5 bg-sky-500/20 text-sky-300 rounded border border-sky-500/30">ADMIN</span>
+            </div>
+            <button onclick="handleAdminLogout()" title="Logout" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition ml-1">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        adminActionGroup.classList.add('hidden');
+        adminActionGroup.classList.remove('flex');
+        authContainer.innerHTML = `
+          <button onclick="openLoginModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-space-card border border-space-border hover:border-sky-500/50 text-slate-300 hover:text-white text-xs font-mono transition active:scale-95 shadow-sm">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-sky-400"></i>
+            <span>ADMIN LOGIN</span>
+          </button>
+        `;
+      }
+      lucide.createIcons();
+      renderLeaderboard();
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginErrorMsg').classList.add('hidden');
+      const modal = document.getElementById('loginModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('loginModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function requestAdminAuthPrompt() {
+      if (!isAdminLoggedIn) {
+        openLoginModal();
+      } else {
+        openPlayerModal();
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const errorMsg = document.getElementById('loginErrorMsg');
+
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        isAdminLoggedIn = true;
+        sessionStorage.setItem('spacetiers_admin_session', 'GlobalizedMC_AUTHENTICATED');
+        closeLoginModal();
+        renderAuthUI();
+        showToast('Authorized: Welcome GlobalizedMC');
+      } else {
+        errorMsg.classList.remove('hidden');
+      }
+    }
+
+    function handleAdminLogout() {
+      isAdminLoggedIn = false;
+      sessionStorage.removeItem('spacetiers_admin_session');
+      const drawer = document.getElementById('customizerDrawer');
+      if (drawer) drawer.classList.add('translate-x-full');
+      renderAuthUI();
+      showToast('Logged out of admin terminal');
+    }
+
+    function calculateTotalPoints(player) {
+      let sum = 0;
+      const tiersObj = player.tiers || {};
+      for (const mode in tiersObj) {
+        const tierKey = tiersObj[mode];
+        if (TIER_SCALE[tierKey]) {
+          sum += TIER_SCALE[tierKey].points;
+        }
+      }
+      return sum;
+    }
+
+    function renderGamemodeTabs() {
+      const container = document.getElementById('gamemodeTabsBar');
+      container.innerHTML = GAMEMODES.map(mode => {
+        const isActive = mode.id === currentGamemode;
+        return `
+          <button 
+            onclick="switchCategory('${mode.id}')"
+            class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300 ${
+              isActive 
+                ? 'bg-sky-500 text-slate-950 shadow-space-sm scale-[1.02]' 
+                : 'text-slate-300 hover:text-white bg-space-card border border-space-border hover:border-sky-500/40'
+            }"
+          >
+            <i data-lucide="${mode.icon}" class="w-3.5 h-3.5"></i>
+            <span>${mode.name}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function switchCategory(modeId) {
+      currentGamemode = modeId;
+      const modeObj = GAMEMODES.find(m => m.id === modeId);
+      const isOverall = modeId === 'overall';
+      const modeDisplayName = isOverall ? 'OVERALL TIERS' : (modeObj ? modeObj.name.toUpperCase() : 'OVERALL TIERS');
+      const modeIcon = modeObj ? modeObj.icon : 'trophy';
+      
+      document.getElementById('breadcrumbCurrent').innerHTML = `
+        <i data-lucide="${modeIcon}" class="w-4 h-4 text-sky-400"></i>
+        <span>${modeDisplayName}</span>
+      `;
+
+      if (modeId === 'overall') {
+        document.getElementById('colHeaderPoints').textContent = 'Total Points';
+      } else {
+        const modeName = modeObj ? modeObj.name : '';
+        document.getElementById('colHeaderPoints').textContent = `${modeName} Points`;
+      }
+
+      renderGamemodeTabs();
+      renderLeaderboard();
+    }
+
+    function renderColumnarBoard(filtered) {
+      const colListTier1 = document.getElementById('colListTier1');
+      const colListTier2 = document.getElementById('colListTier2');
+      const colListTier3 = document.getElementById('colListTier3');
+      const colListTier4 = document.getElementById('colListTier4');
+      const colListTier5 = document.getElementById('colListTier5');
+
+      const buckets = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+      filtered.forEach(p => {
+        const tier = (p.tiers && p.tiers[currentGamemode]) ? p.tiers[currentGamemode] : 'UNRANKED';
+        if (tier === 'HT1' || tier === 'LT1') buckets[1].push({ player: p, tier, isHigh: tier === 'HT1' });
+        else if (tier === 'HT2' || tier === 'LT2') buckets[2].push({ player: p, tier, isHigh: tier === 'HT2' });
+        else if (tier === 'HT3' || tier === 'LT3') buckets[3].push({ player: p, tier, isHigh: tier === 'HT3' });
+        else if (tier === 'HT4' || tier === 'LT4') buckets[4].push({ player: p, tier, isHigh: tier === 'HT4' });
+        else if (tier === 'HT5' || tier === 'LT5') buckets[5].push({ player: p, tier, isHigh: tier === 'HT5' });
+      });
+
+      [1, 2, 3, 4, 5].forEach(num => {
+        buckets[num].sort((a, b) => {
+          if (a.isHigh && !b.isHigh) return -1;
+          if (!a.isHigh && b.isHigh) return 1;
+          return a.player.ign.localeCompare(b.player.ign);
+        });
+      });
+
+      document.getElementById('badgeCountTier1').textContent = buckets[1].length;
+      document.getElementById('badgeCountTier2').textContent = buckets[2].length;
+      document.getElementById('badgeCountTier3').textContent = buckets[3].length;
+      document.getElementById('badgeCountTier4').textContent = buckets[4].length;
+      document.getElementById('badgeCountTier5').textContent = buckets[5].length;
+
+      function renderItems(list) {
+        if (list.length === 0) {
+          return `<div class="p-6 text-center text-slate-500 text-[11px] italic">No players certified</div>`;
+        }
+        return list.map(({ player, tier, isHigh }) => {
+          const chevronText = isHigh ? '▲▲' : '▲';
+          const chevronColor = isHigh ? 'text-amber-400 font-extrabold' : 'text-slate-400';
+          return `
+            <div 
+              onclick="inspectPlayer('${player.id}')"
+              class="tier-column-card group flex items-center justify-between p-2 rounded-xl bg-space-bg/65 border border-space-border hover:border-sky-500/50 cursor-pointer"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="relative w-6 h-6 rounded-md overflow-hidden bg-slate-900 border border-slate-700/60 shrink-0">
+                  <img 
+                    src="https://mc-heads.net/avatar/${player.ign}/24" 
+                    onerror="this.src='https://mc-heads.net/avatar/steve/24'"
+                    alt="${player.ign}" 
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  >
+                </div>
+                <span class="font-sans font-semibold text-slate-200 group-hover:text-white truncate text-xs">
+                  ${player.ign}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0 pl-2">
+                <span class="text-[9px] px-1.5 py-0.5 rounded bg-space-card border border-space-border text-slate-400 font-mono font-bold">
+                  ${player.region}
+                </span>
+                <span class="text-[11px] ${chevronColor} tracking-tighter" title="${tier}">
+                  ${chevronText}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      colListTier1.innerHTML = renderItems(buckets[1]);
+      colListTier2.innerHTML = renderItems(buckets[2]);
+      colListTier3.innerHTML = renderItems(buckets[3]);
+      colListTier4.innerHTML = renderItems(buckets[4]);
+      colListTier5.innerHTML = renderItems(buckets[5]);
+      lucide.createIcons();
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardBody');
+      const emptyState = document.getElementById('emptyLeaderboardState');
+      const table = document.getElementById('mainLeaderboardTable');
+      const overallWrapper = document.getElementById('overallTableWrapper');
+      const columnarBoard = document.getElementById('columnarTierBoard');
+
+      let filtered = players.filter(player => {
+        const matchSearch = player.ign.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            player.region.toLowerCase().includes(searchQuery.toLowerCase());
+        if (!matchSearch) return false;
+
+        if (currentRegion !== 'ALL' && player.region !== currentRegion) return false;
+
+        if (currentTierFilter !== 'ALL') {
+          if (currentGamemode === 'overall') {
+            const hasTier = Object.values(player.tiers || {}).indexOf(currentTierFilter) !== -1;
+            if (!hasTier) return false;
+          } else {
+            const playerTier = (player.tiers && player.tiers[currentGamemode]) ? player.tiers[currentGamemode] : 'UNRANKED';
+            if (playerTier !== currentTierFilter) return false;
+          }
+        }
+
+        return true;
+      });
+
+      if (currentGamemode !== 'overall') {
+        overallWrapper.classList.add('hidden');
+        columnarBoard.classList.remove('hidden');
+
+        columnarBoard.querySelectorAll('.animate-flow-col').forEach(el => {
+          el.style.animation = 'none';
+          void el.offsetHeight;
+          el.style.animation = '';
+        });
+
+        renderColumnarBoard(filtered);
+        return;
+      }
+
+      columnarBoard.classList.add('hidden');
+      overallWrapper.classList.remove('hidden');
+
+      filtered.sort((a, b) => {
+        const ptsA = calculateTotalPoints(a);
+        const ptsB = calculateTotalPoints(b);
+        return sortAsc ? ptsB - ptsA : ptsA - ptsB;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        table.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      table.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+
+      const disciplineKeys = ['vanilla', 'nethop', 'smp', 'pot', 'sword', 'mace', 'uhc', 'axe'];
+
+      tbody.innerHTML = filtered.map((player, idx) => {
+        const rank = idx + 1;
+        const totalPts = calculateTotalPoints(player);
+        const combatTitle = getCombatTitle(totalPts);
+
+        let rankBadge = `<span class="font-mono text-slate-400 font-bold text-sm">#${rank}</span>`;
+        if (rank === 1) {
+          rankBadge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/50 font-bold shadow-space-sm text-base">🥇</span>`;
+        } else if (rank === 2) {
+          rankBadge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-300/20 text-slate-200 border border-slate-300/50 font-bold text-base">🥈</span>`;
+        } else if (rank === 3) {
+          rankBadge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-700/20 text-amber-500 border border-amber-700/50 font-bold text-base">🥉</span>`;
+        }
+
+        let pointsColHtml = `<span class="font-bold text-white tracking-wider text-sm sm:text-base">${totalPts} <span class="text-slate-400 text-[10px]">PTS</span></span>`;
+
+        const tierBadgesHtml = disciplineKeys.map(key => {
+          const tier = (player.tiers && player.tiers[key]) ? player.tiers[key] : 'UNRANKED';
+          if (tier === 'UNRANKED') return '';
+          const iconSvg = DISCIPLINE_ICONS[key] || '';
+          return `
+            <div class="flex flex-col items-center gap-1.5 shrink-0" title="${key.toUpperCase()}: ${tier}">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#080d1a] border-2 border-slate-700/80 hover:border-sky-400 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.6)] transition-transform duration-200 hover:scale-110">
+                ${iconSvg}
+              </div>
+              <span class="text-xs font-mono font-black text-amber-400 tracking-wider leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">${tier}</span>
+            </div>
+          `;
+        }).filter(Boolean).join('');
+
+        return `
+          <tr onclick="inspectPlayer('${player.id}')" class="hover:bg-space-cardSubtle/75 transition-all duration-200 group cursor-pointer border-b border-space-border/50">
+            <td class="px-4 py-4 text-center">${rankBadge}</td>
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3.5">
+                <div class="relative w-10 h-10 rounded-xl overflow-hidden border border-space-border bg-space-bg shrink-0 shadow-md">
+                  <img 
+                    src="https://mc-heads.net/avatar/${player.ign}/40" 
+                    onerror="this.src='https://mc-heads.net/avatar/steve/40'" 
+                    alt="${player.ign}"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                  >
+                </div>
+                <div>
+                  <span class="font-bold text-white text-sm sm:text-base group-hover:text-sky-300 transition text-left block leading-tight">
+                    ${player.ign}
+                  </span>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <span class="text-xs leading-none">${combatTitle.icon}</span>
+                    <span class="text-[11px] font-mono leading-none font-semibold ${
+                      combatTitle.class === 'title-grandmaster' ? 'text-amber-300 font-bold' :
+                      combatTitle.class === 'title-master' ? 'text-amber-400 font-semibold' :
+                      combatTitle.class === 'title-ace' ? 'text-rose-400' :
+                      combatTitle.class === 'title-specialist' ? 'text-purple-400' :
+                      combatTitle.class === 'title-cadet' ? 'text-indigo-400' :
+                      combatTitle.class === 'title-novice' ? 'text-slate-300' :
+                      'text-slate-500'
+                    }">${combatTitle.title}</span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4 text-center">
+              <span class="px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-space-bg border border-space-border text-slate-300 shadow-sm">
+                ${player.region}
+              </span>
+            </td>
+            <td class="px-5 py-4 text-center">${pointsColHtml}</td>
+            <td class="px-6 py-4 text-center">
+              <div class="flex items-center justify-center gap-3.5 sm:gap-4 flex-wrap py-1">
+                ${tierBadgesHtml}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function buildRadarChartSvg(playerTiers, themeColor = '#38bdf8') {
+      const modes = [
+        { id: 'sword', label: 'SWORD' },
+        { id: 'vanilla', label: 'CRYSTAL' },
+        { id: 'axe', label: 'AXE' },
+        { id: 'nethop', label: 'NETHERITE' },
+        { id: 'uhc', label: 'UHC' },
+        { id: 'pot', label: 'POTION' },
+        { id: 'mace', label: 'MACE' },
+        { id: 'smp', label: 'SMP' }
+      ];
+
+      const cx = 95, cy = 95, radius = 64;
+      const total = modes.length;
+
+      let webs = '';
+      [0.25, 0.5, 0.75, 1.0].forEach(rFactor => {
+        const pts = [];
+        for (let i = 0; i < total; i++) {
+          const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
+          const x = cx + radius * rFactor * Math.cos(angle);
+          const y = cy + radius * rFactor * Math.sin(angle);
+          pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        }
+        webs += `<polygon points="${pts.join(' ')}" fill="none" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.2"/>`;
+      });
+
+      let spokes = '';
+      for (let i = 0; i < total; i++) {
+        const angle = (Math.PI * 2 / total) * i - Math.PI / 2;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        spokes += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1.2"/>`;
+      }
+
+      const polyPts = [];
+      const nodeCircles = [];
+
+      modes.forEach((m, idx) => {
+        const tier = (playerTiers && playerTiers[m.id]) ? playerTiers[m.id] : 'UNRANKED';
+        const pts = TIER_SCALE[tier] ? TIER_SCALE[tier].points : 0;
+        
+        const factor = pts > 0 ? 0.28 + (pts / 60) * 0.72 : 0.12;
+        const angle = (Math.PI * 2 / total) * idx - Math.PI / 2;
+        const x = cx + radius * factor * Math.cos(angle);
+        const y = cy + radius * factor * Math.sin(angle);
+        polyPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        nodeCircles.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="${themeColor}" stroke="#030611" stroke-width="1.5"/>`);
+      });
+
+      let labels = '';
+      modes.forEach((m, idx) => {
+        const angle = (Math.PI * 2 / total) * idx - Math.PI / 2;
+        const labelRadius = radius + 15;
+        const x = cx + labelRadius * Math.cos(angle);
+        const y = cy + labelRadius * Math.sin(angle);
+        labels += `<text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#7dd3fc" font-weight="700" letter-spacing="0.5">${m.label}</text>`;
+      });
+
+      return `
+        <svg viewBox="0 0 190 190" class="w-full h-full overflow-visible filter drop-shadow-[0_0_8px_rgba(56,189,248,0.3)]">
+          ${webs}
+          ${spokes}
+          <polygon points="${polyPts.join(' ')}" fill="${themeColor}" fill-opacity="0.28" stroke="${themeColor}" stroke-width="2.2" stroke-linejoin="round"/>
+          ${nodeCircles.join('')}
+          ${labels}
+        </svg>
+      `;
+    }
+
+    function inspectPlayer(playerId) {
+      const player = players.find(p => p.id === playerId);
+      if (!player) return;
+
+      const totalPts = calculateTotalPoints(player);
+      const combatTitle = getCombatTitle(totalPts);
+
+      const sorted = [...players].sort((a,b) => calculateTotalPoints(b) - calculateTotalPoints(a));
+      const rankIdx = sorted.findIndex(p => p.id === playerId) + 1;
+
+      const avatarEl = document.getElementById('inspectAvatar');
+      if (avatarEl) avatarEl.src = `https://mc-heads.net/avatar/${player.ign}/96`;
+      
+      const ignEl = document.getElementById('inspectIgn');
+      if (ignEl) ignEl.textContent = player.ign;
+
+      const regEl = document.getElementById('inspectRegionText');
+      if (regEl) regEl.textContent = player.region;
+
+      const crownBadge = document.getElementById('inspectCrownBadge');
+      if (crownBadge) {
+        if (rankIdx === 1) crownBadge.textContent = '👑';
+        else if (rankIdx === 2) crownBadge.textContent = '🥈';
+        else if (rankIdx === 3) crownBadge.textContent = '🥉';
+        else crownBadge.textContent = '🛡';
+      }
+
+      const titleSub = document.getElementById('inspectCombatTitleSub');
+      const titleText = document.getElementById('inspectCombatTitleText');
+      if (titleSub && titleText) {
+        titleText.textContent = combatTitle.title.toUpperCase();
+      }
+
+      const hexEl = document.getElementById('inspectHexCode');
+      if (hexEl) {
+        const mockHex = Math.abs(player.ign.split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0)).toString(16).toUpperCase().padStart(8, '0').slice(0, 8);
+        hexEl.textContent = `SP-${mockHex}`;
+      }
+
+      document.getElementById('inspectGlobalRank').textContent = `#${rankIdx}`;
+      document.getElementById('inspectPointsCount').textContent = totalPts;
+
+      const modeKeys = ['vanilla', 'nethop', 'smp', 'pot', 'sword', 'mace', 'uhc', 'axe'];
+      const activeModes = modeKeys.filter(k => player.tiers && player.tiers[k] && player.tiers[k] !== 'UNRANKED');
+      document.getElementById('inspectModesCount').textContent = activeModes.length;
+
+      let strongestMode = 'None';
+      let strongestTier = 'UNRANKED';
+      let maxPts = -1;
+      modeKeys.forEach(k => {
+        const t = (player.tiers && player.tiers[k]) ? player.tiers[k] : 'UNRANKED';
+        const p = TIER_SCALE[t] ? TIER_SCALE[t].points : 0;
+        if (p > maxPts) {
+          maxPts = p;
+          strongestMode = k;
+          strongestTier = t;
+        }
+      });
+
+      const modeNameDisplay = GAMEMODES.find(m => m.id === strongestMode)?.name || 'Vanilla';
+      document.getElementById('inspectRankedSummary').innerHTML = `Ranked across <strong class="text-white">${activeModes.length}</strong> of nine combat disciplines.`;
+      document.getElementById('inspectStrongestSummary').innerHTML = `Strongest in <strong class="text-white">${modeNameDisplay}</strong> at <span class="font-mono font-bold text-sky-400">${strongestTier}</span>.`;
+
+      document.getElementById('inspectRadarChart').innerHTML = buildRadarChartSvg(player.tiers, '#38bdf8');
+
+      const grid = document.getElementById('inspectDisciplinesGrid');
+      grid.innerHTML = modeKeys.map(k => {
+        const tier = (player.tiers && player.tiers[k]) ? player.tiers[k] : 'UNRANKED';
+        if (tier === 'UNRANKED') return '';
+        const modeObj = GAMEMODES.find(m => m.id === k);
+        const isStrongest = k === strongestMode;
+        const iconSvg = DISCIPLINE_ICONS[k] || '';
+
+        return `
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#162233] border border-sky-500/30 text-sky-200 text-xs font-mono shadow-sm">
+            <div class="w-5 h-5 rounded-lg bg-black/40 flex items-center justify-center shrink-0">
+              ${iconSvg}
+            </div>
+            <span class="text-slate-300 font-medium text-[11px] uppercase">${modeObj?.name || k}</span>
+            <span class="font-bold text-white text-[11px]">${tier}</span>
+            ${isStrongest ? '<span class="text-amber-400 text-xs">★</span>' : ''}
+          </div>
+        `;
+      }).filter(Boolean).join('');
+
+      document.getElementById('inspectNameMcLink').href = `https://namemc.com/profile/${player.ign}`;
+
+      const modal = document.getElementById('playerInspectModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeInspectModal() {
+      const modal = document.getElementById('playerInspectModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function openAdminManagerModal() {
+      if (!isAdminLoggedIn) {
+        openLoginModal();
+        return;
+      }
+      renderAdminManagerList();
+      const modal = document.getElementById('adminManagerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeAdminManagerModal() {
+      const modal = document.getElementById('adminManagerModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function renderAdminManagerList() {
+      const container = document.getElementById('adminPlayerManagerList');
+      if (!players.length) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-500 italic">No players registered in database.</div>`;
+        return;
+      }
+
+      container.innerHTML = players.map(p => {
+        const pts = calculateTotalPoints(p);
+        return `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-space-card border border-space-border hover:border-sky-500/40 transition">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 overflow-hidden shrink-0">
+                <img src="https://mc-heads.net/avatar/${p.ign}/32" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <div class="font-bold text-white text-xs">${p.ign} <span class="text-slate-400 text-[10px]">(${p.region})</span></div>
+                <div class="text-[10px] text-sky-400">${pts} Total Points</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="closeAdminManagerModal(); openPlayerModal('${p.id}')" class="px-3 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold text-[11px] transition flex items-center gap-1">
+                <i data-lucide="edit-3" class="w-3 h-3"></i> Remake Tiers
+              </button>
+              <button onclick="adminDeletePlayerAndRefresh('${p.id}', '${p.ign}')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-[11px] transition flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3 h-3"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function adminDeletePlayerAndRefresh(id, name) {
+      players = players.filter(x => x.id !== id);
+      saveStorage();
+      renderLeaderboard();
+      renderAdminManagerList();
+      showToast(`Removed ${name} from tierlist`);
+    }
+
+    function openPlayerModal(playerId = null) {
+      if (!isAdminLoggedIn) {
+        openLoginModal();
+        return;
+      }
+
+      const form = document.getElementById('playerForm');
+      form.reset();
+
+      const container = document.getElementById('formGamemodeInputs');
+      container.innerHTML = GAMEMODES.filter(m => !m.isOverall).map(m => `
+        <div>
+          <label class="block text-[10px] text-slate-400 truncate mb-1 uppercase">${m.name}</label>
+          <select id="form_tier_${m.id}" class="w-full bg-space-bg border border-space-border text-[11px] rounded-lg p-1.5 text-white focus:border-sky-500">
+            <option value="HT1">HT1 (60 Pts)</option>
+            <option value="LT1">LT1 (45 Pts)</option>
+            <option value="HT2">HT2 (30 Pts)</option>
+            <option value="LT2">LT2 (20 Pts)</option>
+            <option value="HT3">HT3 (10 Pts)</option>
+            <option value="LT3">LT3 (6 Pts)</option>
+            <option value="HT4">HT4 (4 Pts)</option>
+            <option value="LT4">LT4 (3 Pts)</option>
+            <option value="HT5">HT5 (2 Pts)</option>
+            <option value="LT5">LT5 (1 Pt)</option>
+            <option value="UNRANKED">Unranked (0 Pts)</option>
+          </select>
+        </div>
+      `).join('');
+
+      if (playerId) {
+        const player = players.find(p => p.id === playerId);
+        if (player) {
+          document.getElementById('playerModalTitle').textContent = `Edit Player: ${player.ign}`;
+          document.getElementById('formPlayerId').value = player.id;
+          document.getElementById('formIgn').value = player.ign;
+          document.getElementById('formRegion').value = player.region;
+          updateAvatarLive(player.ign);
+
+          GAMEMODES.filter(m => !m.isOverall).forEach(m => {
+            const selectEl = document.getElementById(`form_tier_${m.id}`);
+            if (selectEl) selectEl.value = (player.tiers && player.tiers[m.id]) ? player.tiers[m.id] : 'UNRANKED';
+          });
+        }
+      } else {
+        document.getElementById('playerModalTitle').textContent = 'Register / Certify Player';
+        document.getElementById('formPlayerId').value = '';
+        updateAvatarLive('steve');
+      }
+
+      const modal = document.getElementById('playerModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closePlayerModal() {
+      const modal = document.getElementById('playerModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function updateAvatarLive(ign) {
+      const img = document.getElementById('formAvatarLive');
+      if (!ign) ign = 'steve';
+      img.src = `https://mc-heads.net/avatar/${ign}/24`;
+    }
+
+    function handleSavePlayer(e) {
+      e.preventDefault();
+      const id = document.getElementById('formPlayerId').value || 'player_' + Date.now();
+      const ign = document.getElementById('formIgn').value.trim();
+      const region = document.getElementById('formRegion').value;
+
+      const tiers = {};
+      GAMEMODES.filter(m => !m.isOverall).forEach(m => {
+        tiers[m.id] = document.getElementById(`form_tier_${m.id}`).value;
+      });
+
+      const playerData = { id, ign, region, tiers };
+      const index = players.findIndex(p => p.id === id);
+
+      if (index >= 0) {
+        players[index] = playerData;
+        showToast(`Updated ratings for ${ign}`);
+      } else {
+        players.push(playerData);
+        showToast(`Registered player ${ign}`);
+      }
+
+      saveStorage();
+      closePlayerModal();
+      renderLeaderboard();
+    }
+
+    function deletePlayer(playerId) {
+      const p = players.find(x => x.id === playerId);
+      const name = p ? p.ign : 'player';
+      players = players.filter(x => x.id !== playerId);
+      saveStorage();
+      renderLeaderboard();
+      showToast(`Deleted ${name} from rankings`);
+    }
+
+    function loadDemoSampleSet() {
+      players = [
+        { id: 'p_360mall', ign: '360Mall', region: 'AS', tiers: { vanilla: 'LT2', pot: 'LT2', uhc: 'LT2', sword: 'LT2', axe: 'HT3', mace: 'LT3', smp: 'LT2', nethop: 'HT2' } },
+        { id: 'p_karthik', ign: 'Karthik987', region: 'AS', tiers: { vanilla: 'LT1', pot: 'HT3', uhc: 'HT3', sword: 'HT3', axe: 'HT3', mace: 'HT3', smp: 'HT3', nethop: 'LT3' } },
+        { id: 'p_vlnish', ign: 'VLNISH', region: 'AS', tiers: { vanilla: 'HT3', pot: 'HT3', uhc: 'LT3', sword: 'HT3', axe: 'LT3', mace: 'HT3', smp: 'HT3', nethop: 'LT3' } },
+        { id: 'p_rxplyy', ign: 'Rxplyy', region: 'EU', tiers: { vanilla: 'HT5', pot: 'LT3', uhc: 'LT3', sword: 'LT2', axe: 'LT3', mace: 'HT3', smp: 'LT2', nethop: 'LT3' } },
+        { id: 'p_tmaruuu', ign: 'tmaruuu', region: 'AS', tiers: { vanilla: 'LT2', pot: 'HT3', uhc: 'LT3', sword: 'HT3', axe: 'HT3', mace: 'HT3', smp: 'HT4', nethop: 'HT3' } },
+        { id: 'p_k1rbe', ign: 'K1RBE', region: 'EU', tiers: { vanilla: 'HT1', nethop: 'HT1', smp: 'HT1', pot: 'HT1', sword: 'HT1', mace: 'HT1', uhc: 'HT1', axe: 'HT1' } },
+        { id: 'p_dwggo', ign: 'Dwggo', region: 'EU', tiers: { vanilla: 'LT1', nethop: 'HT1', smp: 'LT1', pot: 'HT2', sword: 'LT1', mace: 'LT1', uhc: 'HT1', axe: 'HT1' } },
+        { id: 'p_cloud', ign: 'cloudmlol', region: 'NA', tiers: { vanilla: 'HT2', nethop: 'HT2', smp: 'LT2', pot: 'LT2', sword: 'HT2', mace: 'HT2', uhc: 'HT2', axe: 'HT2' } },
+        { id: 'p_lokayy', ign: 'Lokayy', region: 'EU', tiers: { vanilla: 'HT4', nethop: 'HT4', smp: 'HT4', pot: 'HT4', sword: 'HT4', mace: 'HT4', uhc: 'LT4', axe: 'HT4' } },
+        { id: 'p_draak', ign: 'Be_Draak', region: 'EU', tiers: { vanilla: 'HT5', nethop: 'HT5', smp: 'HT5', pot: 'HT5', sword: 'HT5', mace: 'HT5', uhc: 'LT5', axe: 'HT5' } }
+      ];
+      saveStorage();
+      renderLeaderboard();
+      showToast('Loaded realistic preview players matching template screenshots!');
+    }
+
+    function clearAllPlayersPrompt() {
+      players = [];
+      saveStorage();
+      renderLeaderboard();
+      showToast('Leaderboard registry cleared');
+    }
+
+    function handleSearch(val) {
+      searchQuery = val;
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (val) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+      renderLeaderboard();
+    }
+
+    function syncHeaderSearch(val) {
+      document.getElementById('searchInput').value = val;
+      handleSearch(val);
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('headerSearchInput').value = '';
+      searchQuery = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderLeaderboard();
+    }
+
+    function setRegionFilter(region) {
+      currentRegion = region;
+      document.querySelectorAll('.region-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-region') === region) {
+          btn.className = 'region-filter-btn px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition';
+        } else {
+          btn.className = 'region-filter-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition';
+        }
+      });
+      renderLeaderboard();
+    }
+
+    function setTierFilter(tier) {
+      currentTierFilter = tier;
+      renderLeaderboard();
+    }
+
+    function toggleSort(field) {
+      if (sortField === field) {
+        sortAsc = !sortAsc;
+      } else {
+        sortField = field;
+        sortAsc = true;
+      }
+      renderLeaderboard();
+    }
+
+    function openRulebookModal() {
+      const m = document.getElementById('rulebookModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeRulebookModal() {
+      const m = document.getElementById('rulebookModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function toggleCustomizer() {
+      if (!isAdminLoggedIn) {
+        openLoginModal();
+        return;
+      }
+      const drawer = document.getElementById('customizerDrawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function setSpaceAccent(hex, glow) {
+      document.documentElement.style.setProperty('--space-accent', hex);
+      document.documentElement.style.setProperty('--space-glow', glow);
+      localStorage.setItem('spacetiers_accent', hex);
+      localStorage.setItem('spacetiers_glow', glow);
+      showToast(`Applied cosmic accent color: ${hex}`);
+    }
+
+    function updatePlatformTitle(val) {
+      const title = val.trim() || 'SpaceTiers';
+      document.getElementById('brandTitleText').textContent = title;
+      localStorage.setItem('spacetiers_title', title);
+    }
+
+    function updateServerInfo(name, ip) {
+      if (name !== null) {
+        document.getElementById('serverDisplayName').textContent = name;
+        localStorage.setItem('spacetiers_server_name', name);
+      }
+      if (ip !== null) {
+        document.getElementById('serverIPText').textContent = ip;
+        localStorage.setItem('spacetiers_server_ip', ip);
+      }
+    }
+
+    function setTableDensity(spacingClass) {
+      const table = document.getElementById('mainLeaderboardTable');
+      table.classList.remove('spacing-cozy', 'spacing-compact');
+      table.classList.add(spacingClass);
+
+      const btnCozy = document.getElementById('btnDensityCozy');
+      const btnCompact = document.getElementById('btnDensityCompact');
+      if (spacingClass === 'spacing-cozy') {
+        btnCozy.className = 'py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition';
+        btnCompact.className = 'py-1 rounded-lg text-slate-400 hover:text-white transition';
+      } else {
+        btnCompact.className = 'py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition';
+        btnCozy.className = 'py-1 rounded-lg text-slate-400 hover:text-white transition';
+      }
+      localStorage.setItem('spacetiers_density', spacingClass);
+    }
+
+    function toggleParticles(enabled) {
+      particlesEnabled = enabled;
+      const canvas = document.getElementById('particleCanvas');
+      canvas.style.display = enabled ? 'block' : 'none';
+      localStorage.setItem('spacetiers_particles', enabled);
+    }
+
+    function exportJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(players, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `spacetiers-players-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Exported player rankings JSON');
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed)) {
+            players = parsed;
+            saveStorage();
+            renderLeaderboard();
+            showToast('Imported player rankings successfully');
+          } else {
+            showToast('Invalid JSON file format');
+          }
+        } catch(err) {
+          showToast('Failed to parse JSON file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2600);
+    }
+
+    function saveStorage() {
+      localStorage.setItem('spacetiers_players', JSON.stringify(players));
+    }
+
+    function loadStorage() {
+      const stored = localStorage.getItem('spacetiers_players');
+      if (stored) {
+        try { players = JSON.parse(stored); } catch(e) { players = []; }
+      } else {
+        players = [];
+      }
+
+      const accent = localStorage.getItem('spacetiers_accent') || '#38bdf8';
+      const glow = localStorage.getItem('spacetiers_glow') || 'rgba(56, 189, 248, 0.22)';
+      setSpaceAccent(accent, glow);
+
+      const title = localStorage.getItem('spacetiers_title') || 'SpaceTiers';
+      updatePlatformTitle(title);
+      document.getElementById('customTitleInput').value = title;
+
+      const serverName = localStorage.getItem('spacetiers_server_name') || 'PvP Club Hub';
+      const serverIp = localStorage.getItem('spacetiers_server_ip') || 'mcpvp.club';
+      updateServerInfo(serverName, serverIp);
+      document.getElementById('customServerNameInput').value = serverName;
+      document.getElementById('customServerIpInput').value = serverIp;
+
+      const density = localStorage.getItem('spacetiers_density') || 'spacing-cozy';
+      setTableDensity(density);
+
+      const particles = localStorage.getItem('spacetiers_particles');
+      if (particles !== null) {
+        const isTrue = particles === 'true';
+        toggleParticles(isTrue);
+        document.getElementById('particleToggle').checked = isTrue;
+      }
+    }
+
+    function initParticleCanvas() {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let w, h;
+      const stars = [];
+      const count = 55;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.18,
+          vy: -Math.random() * 0.25 - 0.05,
+          radius: Math.random() * 1.4 + 0.4,
+          alpha: Math.random() * 0.65 + 0.2,
+          pulse: Math.random() * 0.02 + 0.008
+        });
+      }
+
+      function loop() {
+        if (!particlesEnabled) {
+          requestAnimationFrame(loop);
+          return;
+        }
+        ctx.clearRect(0, 0, w, h);
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--space-accent').trim() || '#38bdf8';
+
+        stars.forEach(s => {
+          s.x += s.vx;
+          s.y += s.vy;
+          if (s.y < 0) s.y = h;
+          if (s.x < 0) s.x = w;
+          if (s.x > w) s.x = 0;
+
+          s.alpha += s.pulse;
+          if (s.alpha > 0.85 || s.alpha < 0.2) s.pulse = -s.pulse;
+
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = s.radius > 1.2 ? accent : '#ffffff';
+          ctx.globalAlpha = Math.max(0.1, Math.min(1, s.alpha));
+          ctx.fill();
+        });
+
+        ctx.globalAlpha = 1.0;
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('discordDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeDiscordPopover();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDiscordPopover();
+        closeLoginModal();
+        closePlayerModal();
+        closeInspectModal();
+        closeRulebookModal();
+        closeAdminManagerModal();
+        const drawer = document.getElementById('customizerDrawer');
+        if (drawer) drawer.classList.add('translate-x-full');
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStorage();
+      initAuth();
+      renderGamemodeTabs();
+      renderLeaderboard();
+      initParticleCanvas();
+    });
+  </script>
+</body>
+</html>
